@@ -11,14 +11,14 @@
 ;; Shape parameters ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(def nrows 4)
+(def nrows 5)
 (def ncols 6)
 
 (def column-curvature (deg2rad 17))                         ; 15                        ; curvature of the columns
-(def row-curvature (deg2rad 6))                             ; 5                   ; curvature of the rows
-(def centerrow 1.75)                              ; controls front-back tilt
-(def centercol 3)                                           ; controls left-right tilt / tenting (higher number is more tenting)
-(def tenting-angle (deg2rad 15))                            ; or, change this for more precise tenting control
+(def row-curvature (deg2rad 5))                             ; 5                   ; curvature of the rows
+(def centerrow 2)                              ; controls front-back tilt
+(def centercol 2)                                           ; controls left-right tilt / tenting (higher number is more tenting)
+(def tenting-angle (/ pi 12))                            ; or, change this for more precise tenting control
 (def column-style
   (if (> nrows 5) :orthographic :standard))
 (defn column-offset [column] (cond
@@ -27,12 +27,12 @@
                                (>= column 4) [0 -10 6]
                                :else [0 0 0]))
 
-(def thumb-offsets [10 -5 1])
+(def thumb-offsets [6 -3 7])
 
-(def keyboard-z-offset 7)                                   ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def keyboard-z-offset 16)                                   ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 (def bottom-height 2)                                    ; plexiglass plate or printed plate
-(def extra-width 3)                                       ; extra space between the base of keys; original= 2
-(def extra-height -0.5)                                      ; original= 0.5
+(def extra-width 2)                                       ; extra space between the base of keys; original= 2
+(def extra-height 0.5)                                      ; original= 0.5
 
 (def wall-z-offset -1)                                      ; -5                ; original=-15 length of the first downward-sloping part of the wall (negative)
 (def wall-xy-offset 1)
@@ -334,12 +334,14 @@
 (defn thumb-r-place [shape] (thumb-place [14 -40 10] [-15 -10 5] shape)) ; right
 (defn thumb-m-place [shape] (thumb-place [10 -23 20] [-33 -15 -6] shape)) ; middle
 (defn thumb-l-place [shape] (thumb-place [6 -5 35] [-52.5 -25.5 -11.5] shape)) ; left
+;(defn thumb-bl-place [shape] (thumb-place [8 -9 27] [-40 -40 -11.5] shape)) ; satoshi 追加
 
 (defn thumb-layout [shape]
   (union
     (thumb-r-place shape)
     (thumb-m-place shape)
     (thumb-l-place shape)
+    ;(thumb-bl-place shape) ; satoshi 追加
     ))
 
 (defn debug [shape]
@@ -585,8 +587,8 @@
 (spit "things/right.scad"
       (write-scad model-right))
 ;
-;(spit "things/left.scad"
-;      (write-scad (mirror [-1 0 0] model-right)))
+(spit "things/left.scad"
+      (write-scad (mirror [-1 0 0] model-right)))
 (spit "things/test.scad"
       (write-scad
         (difference
@@ -666,6 +668,19 @@
             bottom-screw-holes-head
             bottom-screw-holes-top
             ))))
+
+(spit "things/left-plate-print.scad"
+      (write-scad (mirror [-1 0 0] 
+        (difference
+          bottom-plate
+          (union
+            bottom-wall-usb-holder
+            key-space-below
+            thumb-space-below
+            bottom-screw-holes-head
+            bottom-screw-holes-top
+            ))
+      )))
 
 (spit "things/right-plate-cut.scad"
       (write-scad
